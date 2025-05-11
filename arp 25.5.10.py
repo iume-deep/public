@@ -5,13 +5,13 @@ import threading
 import tkinter as tk
 from tkinter import messagebox, ttk, scrolledtext
 from scapy.all import *
-'''
+
 for line in os.popen('route print'):
     s = line.strip()
     if s.startswith("0.0.0.0"):
         iplist = s.split()
         gateway_ip = iplist[2]  # 网关
-'''
+
 stop = 0
 DOSS = 'OFF'
 runarp = 'OFF'

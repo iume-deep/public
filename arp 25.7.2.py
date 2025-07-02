@@ -248,10 +248,10 @@ class ARPSpoofingApp:
     def doss(self):
         global DOSS
         if self.scan_button["text"] == "DOSS-ON":
-            self.scan_button.config(text="DOSS-OFF", bg="green")
+            self.scan_button.config(text="DOSS-OFF")
             DOSS = "OFF"
         else:
-            self.scan_button.config(text="DOSS-ON", bg="red")
+            self.scan_button.config(text="DOSS-ON")
             DOSS = "ON"
 
     def doss_s(self, vip):
@@ -331,11 +331,11 @@ class ARPSpoofingApp:
             self.log("错误:应该没有找到IP")
             messagebox.showerror("错误:", "应该没有找到IP")
             return
-        gateway_ip = str(myip)[:-3] + '1'
+        gateway_ip = str(myip[:2])
         gateway_ip = gateway_ip[2:]
-        subnet = str(myip)[:-3] + '0' + "/24"
-        subnet = subnet[2:]
-        self.log(f"扫描的网关/接口: {subnet}")
+        subnet = (".".join(gateway_ip.split(".")[:-1])) + '.0/24'
+        gateway_ip = (".".join(gateway_ip.split(".")[:-1]))+'.1'
+        self.log(f"扫描的接口: {subnet}")
 
         def gatewayError():
             global gateway_ip

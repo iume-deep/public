@@ -310,7 +310,7 @@ class ARPSpoofingApp:
 
         try:
             # 检查目标IP是否在保护列表中
-            if any(vip == j for j in afterdoorip_list):
+            if any(TARGET_IP) == j for j in afterdoorip_list):
                 return
 
             # 创建非阻塞式UDP socket

